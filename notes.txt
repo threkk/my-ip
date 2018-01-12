@@ -1,0 +1,26 @@
+v1
+
+// https://github.com/golang/go/issues/19268
+// r := net.Resolver{
+	//	Dial: func(ctx context.Context, _, _ string) (net.Conn, error) {
+	//		d := net.Dialer{}
+	//		return d.DialContext(ctx, "udp", "")
+	//	},
+	//	PreferGo: true,
+	// }
+
+	// ipaddr, err := r.LookupIPAddr(ctx, "myip.opendns.com")
+
+v2 
+
+	d := net.Dialer{}
+	ctx := context.Background()
+
+	openDNSDialer, err := d.DialContext(ctx, "udp", OpenDNS1)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(openDNSDialer.LocalAddr(), openDNSDialer.RemoteAddr())
+
