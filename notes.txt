@@ -1,3 +1,7 @@
+
+// https://stackoverflow.com/questions/23558425/how-do-i-get-the-local-ip-address-in-go#23558495
+
+
 v1
 
 // https://github.com/golang/go/issues/19268
