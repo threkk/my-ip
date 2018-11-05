@@ -1,6 +1,6 @@
 # MyIP
 [![GoDoc](https://godoc.org/github.com/threkk/myip?status.svg)](https://godoc.org/github.com/threkk/myip) [![Go Report Card](https://goreportcard.com/badge/github.com/threkk/myip)](https://goreportcard.com/report/github.com/threkk/myip) [![GitHub license](https://img.shields.io/github/license/threkk/myip.svg)](https://github.com/threkk/myip/blob/master/LICENSE.md) [![Twitter](https://img.shields.io/twitter/url/https/github.com/threkk/myip.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2Fthrekk%2Fmyip)
-> Returns the IP addresses of the system.
+> Gets the IP addresses of the system.
 
 ## Features
 - Works with IPv6.
