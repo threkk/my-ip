@@ -63,6 +63,14 @@ func bold(str string) string {
 	return fmt.Sprintf("\033[1m%s\033[0m", str)
 }
 
+// check Checks for errors
+func check(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Operation failed: %s\n", err)
+		os.Exit(1)
+	}
+}
+
 // printArr Function used to print an array with address.
 func printArr(strs []string, title string) {
 	if len(strs) == 0 {
@@ -111,7 +119,33 @@ func main() {
 	}
 
 	if isBitbar {
-		// TODO
+		// Create the file.
+		f, err := os.Create("myip.60s.sh")
+		check(err)
+
+		defer f.Close()
+
+		// Give it execution permissions.
+		err = f.Chmod(0755)
+		check(err)
+
+		path, err := os.Executable()
+		check(err)
+
+		const scriptTpl = `#!/usr/bin/env bash
+# <bitbar.title>MyIP</bitbar.title>
+# <bitbar.version>%s</bitbar.version>
+# <bitbar.author>Alberto Martinez de Murga Ramirez</bitbar.author>
+# <bitbar.author.github>threkk</bitbar.author.github>
+# <bitbar.desc>Returns the IP addresses of the system.</bitbar.desc>
+%s -public -local`
+
+		script := fmt.Sprintf(scriptTpl, version, path)
+
+		_, err = f.WriteString(script)
+		check(err)
+
+		os.Exit(0)
 	}
 
 	if !isLocal && !isPublic {
@@ -128,11 +162,7 @@ func main() {
 
 	if isLocal {
 		locals, err := myip.Local()
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Operation failed: %s\n", err)
-			os.Exit(1)
-		}
+		check(err)
 
 		response.Local = locals
 		if !isJSON {
@@ -143,11 +173,7 @@ func main() {
 	if isPublic {
 		ctxbg := context.Background()
 		publics, err := myip.Public(ctxbg)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Operation failed: %s\n", err)
-			os.Exit(1)
-		}
+		check(err)
 
 		response.Public = publics
 		if !isJSON {
@@ -157,11 +183,7 @@ func main() {
 
 	if isJSON {
 		bytes, err := json.Marshal(response)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Operation failed: %s\n", err)
-			os.Exit(1)
-		}
+		check(err)
 
 		fmt.Fprintf(os.Stdout, "%s\n", string(bytes[:]))
 		os.Exit(0)
