@@ -5,13 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/threkk/myip"
+	"github.com/threkk/myip/pkg/myip"
 	"os"
 	"strings"
 )
 
 // version Version of the software.
-const version string = "1.0.0"
+var version string
+
+// noColor Disable colouring the output.
+var noColor = false
 
 // isPublic If true, retrieves the public addresses.
 var isPublic bool
@@ -31,6 +34,9 @@ var isLong bool
 // isVersion If true, return the version of the software.
 var isVersion bool
 
+// isBitbar If true, generate a Bitbar compatible string.
+var isBitbar bool
+
 // jsonFormat Type used to define the structure of the JSON response.
 type jsonFormat struct {
 	Local  []string `json:"local"`
@@ -40,7 +46,7 @@ type jsonFormat struct {
 // usage Custom usage function to return in case of error or help message.
 func usage(out *os.File, description bool) {
 	if description {
-		fmt.Fprintf(out, "Returns the addresses of the system.\n")
+		fmt.Fprintf(out, "Returns the IP addresses of the system.\n")
 		fmt.Fprintf(out, "\n")
 	}
 	fmt.Fprintf(out, "Usage: %s [options]\n", os.Args[0])
@@ -49,16 +55,25 @@ func usage(out *os.File, description bool) {
 	flag.PrintDefaults()
 }
 
+// bold Turns a string into bold if the noColor flag is not enabled.
+func bold(str string) string {
+	if noColor {
+		return str
+	}
+	return fmt.Sprintf("\033[1m%s\033[0m", str)
+}
+
 // printArr Function used to print an array with address.
 func printArr(strs []string, title string) {
 	if len(strs) == 0 {
 		fmt.Fprintf(os.Stdout, "No addresses were found.\n")
 	} else {
 		if isLong {
-			fmt.Fprintf(os.Stdout, "\033[1m%s:\033[0m\n", title)
+			fmt.Fprintf(os.Stdout, "%s: ", bold(title))
 			for _, local := range strs {
-				fmt.Fprintf(os.Stdout, "\t%s\n", local)
+				fmt.Fprintf(os.Stdout, "%s ", local)
 			}
+			fmt.Fprintf(os.Stdout, "\n")
 		} else {
 			fmt.Fprintf(os.Stdout, "%s\n", strings.Join(strs, " "))
 		}
@@ -66,12 +81,21 @@ func printArr(strs []string, title string) {
 }
 
 func init() {
-	flag.BoolVar(&isPublic, "public", false, "Retrieves the public address.")
-	flag.BoolVar(&isLocal, "local", false, "Retrieves the local addresses.")
-	flag.BoolVar(&ipv6, "ipv6", false, "Prefer IPv6 over IPv4.")
-	flag.BoolVar(&isLong, "long", false, "Use long output.")
-	flag.BoolVar(&isJSON, "json", false, "Export the results in JSON format.")
-	flag.BoolVar(&isVersion, "version", false, "Display the version number.")
+	if version == "" {
+		version = "dev"
+	}
+
+	if os.Getenv("NO_COLOR") != "" {
+		noColor = true
+	}
+
+	flag.BoolVar(&isPublic, "public", false, "Retrieves the public address")
+	flag.BoolVar(&isLocal, "local", false, "Retrieves the local addresses")
+	flag.BoolVar(&ipv6, "ipv6", false, "Prefer IPv6 over IPv4")
+	flag.BoolVar(&isLong, "long", false, "Use long output")
+	flag.BoolVar(&isJSON, "json", false, "Export the results in JSON format")
+	flag.BoolVar(&isVersion, "version", false, "Display the version number")
+	flag.BoolVar(&isBitbar, "bitbar", false, "Generate a Bitbar compatible plugin")
 
 	flag.Usage = func() {
 		usage(os.Stdout, true)
@@ -84,6 +108,10 @@ func main() {
 	if isVersion {
 		fmt.Fprintf(os.Stdout, "%s\n", version)
 		os.Exit(0)
+	}
+
+	if isBitbar {
+		// TODO
 	}
 
 	if !isLocal && !isPublic {
