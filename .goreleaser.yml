@@ -12,7 +12,7 @@ builds:
       - linux
       - windows
 archive:
-  name_template: '{{ .ProjectName }}_{{ .Os }}-{{ .Version }}'
+  name_template: '{{ .ProjectName }}_{{ .Os }}-{{ .Arch }}-{{ .Version }}'
   replacements:
     darwin: macos
 checksum:
